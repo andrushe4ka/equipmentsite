@@ -20,10 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 ]
 
-from django.urls import include
-
 from myapi import views
-from django.conf.urls import url
 urlpatterns += [
     path('', views.index),
 ]
@@ -33,4 +30,5 @@ from django.conf.urls.static import static
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
+from django.urls import include
 urlpatterns += [path('api/', include('myapi.urls'))]

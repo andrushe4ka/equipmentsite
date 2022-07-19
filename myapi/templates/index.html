@@ -26,7 +26,6 @@
 			<label>Примечание</label>
 			<textarea v-model="note"></textarea>
 		</p>
-    {% verbatim %}<p>{{ message }}</p>{% endverbatim %}
     <button v-on:click="sendData">Добавить</button>
   </div>
   
@@ -46,8 +45,8 @@
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify({
 							serial_number: this.serial_number,
-							type: "http://127.0.0.1:8000/api/equipment-type/" + this.selected_type.toString() + "/"
-							//type: this.selected_type
+							//type: "http://127.0.0.1:8000/api/equipment-type/" + this.selected_type.toString() + "/"
+							type: this.selected_type
 						})
 					};
 					console.log(requestOptions)
