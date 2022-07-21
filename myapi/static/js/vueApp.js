@@ -8,11 +8,13 @@ var app = new Vue({
 	},
 	methods: {
 		sendData() {
+			var serial_number = this.serial_number.trim().split(/\s+/);
+			console.log(serial_number)
 			const requestOptions = {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					serial_number: this.serial_number,
+					serial_number: serial_number,
 					note: this.note,
 					//type: "http://127.0.0.1:8000/api/equipment-type/" + this.selected_type.toString() + "/"
 					type: this.selected_type

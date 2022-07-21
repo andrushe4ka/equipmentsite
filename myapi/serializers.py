@@ -12,13 +12,23 @@ class EquipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Equipment
         fields = ('serial_number', 'note', 'type')
+
+class EquipmentCreateSerializer(serializers.Serializer):
+    serial_number = serializers.ListField(
+        child=serializers.CharField(help_text='Enter serial number', max_length=200)
+    )
+    note = serializers.CharField(help_text='Enter a note', max_length=200)
+    type = serializers.PrimaryKeyRelatedField(allow_null=True, queryset=models.EquipmentType.objects.all(), required=False)
+
     def validate(self, data):
         """
         Check that serial number corresponds to the mask.
         """
         serial_number_mask = data['type'].serial_number_mask
-        if len(data['serial_number']) < len(serial_number_mask):
-            raise serializers.ValidationError("Serial number length incorrect")
+        print(data['serial_number'])
+        for serial_number in data['serial_number']:
+            if len(serial_number) != len(serial_number_mask):
+                raise serializers.ValidationError("Serial number length incorrect")
 
         #N - digit from 0 to 9
         #A - capital letter
@@ -37,7 +47,8 @@ class EquipmentSerializer(serializers.ModelSerializer):
             regex += mask_decode[symbol]
         regex += r'$'
 
-        ans = re.match(regex, data['serial_number'])
-        if not ans:
-            raise serializers.ValidationError("Doesn't match the mask")
+        for serial_number in data['serial_number']:
+            ans = re.match(regex, serial_number)
+            if not ans:
+                raise serializers.ValidationError("Not matching the mask " + serial_number_mask + "\n" + serial_number)
         return data
