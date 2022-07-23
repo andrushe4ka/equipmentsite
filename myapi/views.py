@@ -3,7 +3,6 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework import viewsets
 from rest_framework import generics
-from rest_framework import views
 
 from . import serializers
 from .models import EquipmentType, Equipment
@@ -23,7 +22,12 @@ class EquipmentViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny, )
 
 from rest_framework.response import Response
-class EquipmentCreateView(views.APIView):
+from rest_framework import filters
+class EquipmentCreateView(generics.ListCreateAPIView):
+    queryset = Equipment.objects.all()
+    serializer_class = serializers.EquipmentSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['serial_number', 'note']
     authentication_classes = [BasicAuthentication]
     permission_classes = (AllowAny, )
     def post(self, request):

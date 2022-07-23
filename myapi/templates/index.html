@@ -7,29 +7,59 @@
 </head>
 <body>
   <div id="formAdd">
-		<p>Форма добавления записей</p>
-		
-		<p>
-			<label>Тип оборудования</label>
-			<select v-model="selected_type">
-				<option v-for="option in options" v-bind:value="option.id">
-					{% verbatim %}{{ option.name }}{% endverbatim %}
-				</option>
-			</select>
-		</p>
-		
-		<p>
-			<label>Серийные номера</label>
-			<textarea required v-model="serial_number"></textarea>
-		</p>
-		
-		<p>
-			<label>Примечание</label>
-			<textarea v-model="note"></textarea>
-		</p>
-    <button v-on:click="sendData">Добавить</button>
+		<form v-on:submit.prevent="sendData">
+			<fieldset>
+				<legend>Форма добавления записей</legend>
+				<p>
+					<label>Тип оборудования</label>
+					<select required v-model="selected_type">
+						<option v-for="option in options" v-bind:value="option.id">
+							{% verbatim %}{{ option.name }}{% endverbatim %}
+						</option>
+					</select>
+				</p>
+
+				<p>
+					<label>Серийные номера</label>
+					<textarea required v-model="serial_number"></textarea>
+				</p>
+
+				<p>
+					<label>Примечание</label>
+					<textarea v-model="note"></textarea>
+				</p>
+				<button>Добавить</button>
+			</fieldset>
+		</form>
   </div>
-  
-  <script src="{% static 'js/vueApp.js' %}"></script>
+
+  <div id="formView">
+		<form v-on:submit.prevent="getData">
+			<fieldset>
+				<legend>Поиск</legend>
+				<input v-model="searchText">
+				<button>Поиск</button>
+			</fieldset>
+		</form>
+		<table>
+			<tr>
+				<th>Tип оборудования</th>
+				<th>Серийный номер</th>
+				<th>Примечание</th>
+				<th>Действия</th>
+			</tr>
+			<tr
+				is="equipment-item"
+				v-for="equipment in equipments"
+				v-bind:key="equipment.id"
+				v-bind:type="equipment.type"
+				v-bind:serial_number="equipment.serial_number"
+				v-bind:note="equipment.note"
+				v-on:remove="remData"
+			></tr>
+		</table>
+	</div>
+
+	<script src="{% static 'js/vueApp.js' %}"></script>
 </body>
 </html>
