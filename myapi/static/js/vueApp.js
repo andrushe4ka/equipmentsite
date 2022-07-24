@@ -93,6 +93,7 @@ fetch("http://127.0.0.1:8000/api/equipment-type/", {
 .then(response => {
 	console.log(response)
 	app.options = response
+	app2.options = app.options
 	//for (const idx in response) {
 	//	app.options.push(response[idx].name)
 	//}
@@ -100,16 +101,35 @@ fetch("http://127.0.0.1:8000/api/equipment-type/", {
 
 Vue.component('equipment-item', {
 	delimiters: ["[[","]]"],
+	data: function () {
+		return {
+			mode: 0,
+		}
+	},
 	template:
 	'\
 		<tr>\
-			<td>[[ type ]]</td>\
-			<td>[[ serial_number ]]</td>\
-			<td>[[ note ]]</td>\
-			<td><button v-on:click="$emit(\'remove\')">Удалить</button></td>\
+			<td>\
+				<select :disabled="[[ mode ]] == 0" v-model="type">\
+					<option v-for="option in options" v-bind:value="option.id">\
+						[[ option.name ]]\
+					</option>\
+				</select>\
+			<td><input :disabled="[[ mode ]] == 0" v-model="serial_number"></td>\
+			<td><input :disabled="[[ mode ]] == 0" v-model="note"></td>\
+			<td>\
+				<template v-if="[[ mode ]] == 0">\
+					<button v-on:click="mode = 1">Изменить</button>\
+					<button v-on:click="$emit(\'remove\')">Удалить</button>\
+				</template>\
+				<template v-if="[[ mode ]] == 1">\
+					<button v-on:click="mode = 0; $emit(\'save\')">Сохранить</button>\
+					<button v-on:click="mode = 0; $emit(\'reload\')">Отмена</button>\
+				</template>\
+			</td>\
 		</tr>\
 	',
-	props: ['type', 'serial_number', 'note']
+	props: ['type', 'serial_number', 'note', 'options']
 })
 
 app2 = new Vue({
@@ -117,6 +137,7 @@ app2 = new Vue({
 	data: {
 		searchText: '',
 		equipments: [],
+		options: [],
 	},
 	methods: {
 		getData: function () {
@@ -133,8 +154,11 @@ app2 = new Vue({
 				function(response) {if (response.length > 0) app2.equipments = response; else alert('Nothing found')}
 			)
 		},
-		remData: function () {
-			console.log('Hello')
+		remData: function (index) {
+			console.log('Remove', index)
+		},
+		modData: function (index) {
+			console.log('Modify', index)
 		}
 	}
 })

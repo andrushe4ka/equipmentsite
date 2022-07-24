@@ -50,12 +50,14 @@
 			</tr>
 			<tr
 				is="equipment-item"
-				v-for="equipment in equipments"
+				v-for="(equipment, index) in equipments"
 				v-bind:key="equipment.id"
 				v-bind:type="equipment.type"
 				v-bind:serial_number="equipment.serial_number"
 				v-bind:note="equipment.note"
-				v-on:remove="remData"
+				v-bind:options="options"
+				v-on:remove="remData(index)"
+				v-on:save="modData(index)"
 			></tr>
 		</table>
 	</div>
