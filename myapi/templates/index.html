@@ -37,7 +37,7 @@
 		<form v-on:submit.prevent="getData">
 			<fieldset>
 				<legend>Поиск</legend>
-				<input v-model="searchText">
+				<input required v-model="searchText">
 				<button>Поиск</button>
 			</fieldset>
 		</form>
@@ -50,14 +50,12 @@
 			</tr>
 			<tr
 				is="equipment-item"
-				v-for="(equipment, index) in equipments"
+				v-for="equipment in equipments"
 				v-bind:key="equipment.id"
-				v-bind:type="equipment.type"
-				v-bind:serial_number="equipment.serial_number"
-				v-bind:note="equipment.note"
+				v-bind:equipment="equipment"
 				v-bind:options="options"
-				v-on:remove="remData(index)"
-				v-on:save="modData(index)"
+				v-on:remove="remData(equipment.id)"
+				v-on:modify="modData(equipment.id, $event)"
 			></tr>
 		</table>
 	</div>

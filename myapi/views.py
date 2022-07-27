@@ -40,6 +40,12 @@ class EquipmentCreateView(generics.ListCreateAPIView):
         ) for serial_number in request.data['serial_number']]
         return Response([serializers.EquipmentSerializer(post).data for post in post_new], status=201)
 
+class EquipmentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Equipment.objects.all()
+    serializer_class = serializers.EquipmentSerializer
+    authentication_classes = [BasicAuthentication]
+    permission_classes = (AllowAny, )
+
 def index(request):
     return render(
         request,

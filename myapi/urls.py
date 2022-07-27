@@ -11,5 +11,6 @@ urlpatterns = [
     #path('', include(router.urls)),
     path('equipment/', views.EquipmentCreateView.as_view()),
     path('equipment-type/', views.EquipmentTypeView.as_view()),
+    path('equipment/<int:pk>/', views.EquipmentDetailView.as_view()),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

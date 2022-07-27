@@ -8,11 +8,14 @@ function callAPI(requestOptions, relURL, action) {
 	.then(response => {
 		console.log(response)
 		if (response.ok){
-			response.json()
-			.then(function (result) {
-				console.log(result);
-				action(result);
-			})
+			const contentType = response.headers.get("content-type");
+			if (contentType && contentType.indexOf("application/json") !== -1) {
+				response.json()
+				.then(function (result) {
+					console.log(result);
+					action(result);
+				})
+			} else action();
 		} else{
 			response.json()
 			.then(result => {
@@ -21,7 +24,7 @@ function callAPI(requestOptions, relURL, action) {
 					"Server returned " + response.status + " : " + response.statusText + "\n" +
 					get_details(result)
 				);
-			})
+			}, error => console.log(error))
 		}
 	})
 }
@@ -104,32 +107,50 @@ Vue.component('equipment-item', {
 	data: function () {
 		return {
 			mode: 0,
+			type: this.equipment.type,
+			serial_number: this.equipment.serial_number,
+			note: this.equipment.note,
 		}
 	},
 	template:
 	'\
 		<tr>\
 			<td>\
-				<select :disabled="[[ mode ]] == 0" v-model="type">\
+				<select :disabled="mode == 0" v-model="type">\
 					<option v-for="option in options" v-bind:value="option.id">\
 						[[ option.name ]]\
 					</option>\
 				</select>\
-			<td><input :disabled="[[ mode ]] == 0" v-model="serial_number"></td>\
-			<td><input :disabled="[[ mode ]] == 0" v-model="note"></td>\
+			<td><input :readonly="mode == 0" v-model="serial_number"></td>\
+			<td><input :readonly="mode == 0" v-model="note"></td>\
 			<td>\
-				<template v-if="[[ mode ]] == 0">\
+				<template v-if="mode == 0">\
 					<button v-on:click="mode = 1">Изменить</button>\
 					<button v-on:click="$emit(\'remove\')">Удалить</button>\
 				</template>\
-				<template v-if="[[ mode ]] == 1">\
-					<button v-on:click="mode = 0; $emit(\'save\')">Сохранить</button>\
-					<button v-on:click="mode = 0; $emit(\'reload\')">Отмена</button>\
+				<template v-if="mode == 1">\
+					<button v-on:click="mode = 0; save()">Сохранить</button>\
+					<button v-on:click="mode = 0; reload()">Отмена</button>\
 				</template>\
 			</td>\
 		</tr>\
 	',
-	props: ['type', 'serial_number', 'note', 'options']
+	props: ['equipment', 'options'],
+	methods: {
+		reload :function () {
+			console.log('reload', this.equipment.note);
+			this.type = this.equipment.type;
+			this.serial_number = this.equipment.serial_number;
+			this.note = this.equipment.note;
+		},
+		save : function () {
+			this.$emit('modify', {
+				type: this.type,
+				serial_number: this.serial_number,
+				note : this.note,
+			})
+		},
+	}
 })
 
 app2 = new Vue({
@@ -151,14 +172,35 @@ app2 = new Vue({
 			callAPI(
 				requestOptions,
 				'equipment/?search=' + this.searchText,
-				function(response) {if (response.length > 0) app2.equipments = response; else alert('Nothing found')}
+				function(response) {
+					app2.equipments = response;
+					if (response.length == 0) alert('Nothing found')
+				}
 			)
 		},
-		remData: function (index) {
-			console.log('Remove', index)
+		remData: function (id) {
+			console.log('Remove', id)
+			const requestOptions = {
+				method: "DELETE",
+			};
+			callAPI(
+				requestOptions,
+				'equipment/' + id.toString() + '/',
+				function(response) {app2.getData()}
+			)
 		},
-		modData: function (index) {
-			console.log('Modify', index)
+		modData: function (id, data) {
+			console.log('Modify', id, data)
+			const requestOptions = {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			};
+			callAPI(
+				requestOptions,
+				'equipment/' + id.toString() + '/',
+				function(response) {app2.getData()}
+			)
 		}
 	}
 })
