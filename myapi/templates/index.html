@@ -4,48 +4,62 @@
 <head>
   <title>My first Vue app</title>
   <script src="https://unpkg.com/vue@2"></script>
+  <!-- UIkit CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.1/dist/css/uikit.min.css" />
+
+	<!-- UIkit JS -->
+	<script src="https://cdn.jsdelivr.net/npm/uikit@3.15.1/dist/js/uikit.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@3.15.1/dist/js/uikit-icons.min.js"></script>
 </head>
 <body>
-  <div id="formAdd">
-		<form v-on:submit.prevent="sendData">
-			<fieldset>
-				<legend>Форма добавления записей</legend>
-				<p>
-					<label>Тип оборудования</label>
-					<select required v-model="selected_type">
-						<option v-for="option in options" v-bind:value="option.id">
-							{% verbatim %}{{ option.name }}{% endverbatim %}
-						</option>
-					</select>
-				</p>
+  <div id="formAdd" class="uk-margin-left">
+		<form v-on:submit.prevent="sendData" class="uk-form-horizontal">
+			<fieldset class="uk-fieldset">
+				<legend class="uk-legend">Добавить оборудование</legend>
+				<div class="uk-margin">
+					<label class="uk-form-label">Тип оборудования</label>
+					<div class="uk-form-controls">
+						<select required v-model="selected_type" class="uk-select uk-form-width-large">
+							<option v-for="option in options" v-bind:value="option.id">
+								{% verbatim %}{{ option.name }}{% endverbatim %}
+							</option>
+						</select>
+					</div>
+				</div>
 
-				<p>
-					<label>Серийные номера</label>
-					<textarea required v-model="serial_number"></textarea>
-				</p>
+				<div class="uk-margin">
+					<label class="uk-form-label">Серийные номера</label>
+					<div class="uk-form-controls">
+						<textarea required v-model="serial_number" class="uk-textarea uk-form-width-large"></textarea>
+					</div>
+				</div>
 
-				<p>
-					<label>Примечание</label>
-					<textarea v-model="note"></textarea>
-				</p>
-				<button>Добавить</button>
+				<div class="uk-margin">
+					<label class="uk-form-label">Примечание</label>
+					<div class="uk-form-controls">
+						<textarea v-model="note" class="uk-textarea uk-form-width-large"></textarea>
+					</div>
+				</div>
+				<button class="uk-button uk-button-primary">Добавить</button>
 			</fieldset>
 		</form>
   </div>
-
-  <div id="formView">
+	<hr>
+  <div id="formView" class="uk-margin-left">
 		<form v-on:submit.prevent="getData">
-			<fieldset>
-				<legend>Поиск</legend>
-				<input required v-model="searchText">
-				<button>Поиск</button>
+			<fieldset class="uk-fieldset">
+				<legend class="uk-legend">Поиск</legend>
+				<div class="uk-margin">
+					<input required v-model="searchText" class="uk-input uk-form-width-medium">
+					<button class="uk-button uk-button-primary">Поиск</button>
+				</div>
 			</fieldset>
 		</form>
-		<table>
+		<table class="uk-table uk-table-small">
 			<tr>
-				<th>Tип оборудования</th>
-				<th>Серийный номер</th>
-				<th>Примечание</th>
+				<th class="uk-table-shrink">Tип оборудования</th>
+				<th class="uk-table-shrink">Серийный номер</th>
+				<th class="uk-table-shrink">Примечание</th>
 				<th>Действия</th>
 			</tr>
 			<tr
@@ -58,7 +72,7 @@
 				v-on:modify="modData(equipment.id, $event)"
 			></tr>
 		</table>
-		<p><button v-on:click="addData" v-if="show_load_more">Загрузить еще</button></p>
+		<p><button v-on:click="addData" v-if="show_load_more" class="uk-button uk-button-primary">Загрузить еще</button></p>
 	</div>
 
 	<script src="{% static 'js/vueApp.js' %}"></script>

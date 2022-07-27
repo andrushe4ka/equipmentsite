@@ -119,21 +119,21 @@ Vue.component('equipment-item', {
 	'\
 		<tr>\
 			<td>\
-				<select :disabled="mode == 0" v-model="type">\
+				<select class="uk-select uk-form-width-medium" :disabled="mode == 0" v-model="type">\
 					<option v-for="option in options" v-bind:value="option.id">\
 						[[ option.name ]]\
 					</option>\
 				</select>\
-			<td><input :readonly="mode == 0" v-model="serial_number"></td>\
-			<td><input :readonly="mode == 0" v-model="note"></td>\
+			<td><input class="uk-input uk-form-width-medium" :readonly="mode == 0" v-model="serial_number"></td>\
+			<td><input class="uk-input uk-form-width-medium" :readonly="mode == 0" v-model="note"></td>\
 			<td>\
 				<template v-if="mode == 0">\
-					<button v-on:click="mode = 1">Изменить</button>\
-					<button v-on:click="$emit(\'remove\')">Удалить</button>\
+					<button class="uk-button uk-button-default" v-on:click="mode = 1">Изменить</button>\
+					<button class="uk-button uk-button-default" v-on:click="$emit(\'remove\')">Удалить</button>\
 				</template>\
 				<template v-if="mode == 1">\
-					<button v-on:click="mode = 0; save()">Сохранить</button>\
-					<button v-on:click="mode = 0; reload()">Отмена</button>\
+					<button class="uk-button uk-button-default" v-on:click="mode = 0; save()">Сохранить</button>\
+					<button class="uk-button uk-button-default" v-on:click="mode = 0; reload()">Отмена</button>\
 				</template>\
 			</td>\
 		</tr>\
