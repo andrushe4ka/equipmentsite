@@ -64,12 +64,13 @@
 			</tr>
 			<tr
 				is="equipment-item"
-				v-for="equipment in equipments"
+				ref="row"
+				v-for="(equipment, index) in equipments"
 				v-bind:key="equipment.id"
 				v-bind:equipment="equipment"
 				v-bind:options="options"
-				v-on:remove="remData(equipment.id)"
-				v-on:modify="modData(equipment.id, $event)"
+				v-on:remove="remData(equipment.id, index)"
+				v-on:modify="modData(equipment.id, index, $event)"
 			></tr>
 		</table>
 		<p><button v-on:click="addData" v-if="show_load_more" class="uk-button uk-button-primary">Загрузить еще</button></p>

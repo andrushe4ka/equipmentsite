@@ -32,6 +32,15 @@ function callAPI(requestOptions, URL, action) {
 	})
 }
 
+callAPI(
+	{"method": "GET"},
+	apiHost + 'api/equipment-type/',
+	function(response) {
+		app.options = response
+		app2.options = response
+	}
+)
+
 var app = new Vue({
 	el: '#formAdd',
 	data: {
@@ -44,65 +53,26 @@ var app = new Vue({
 		sendData() {
 			var serial_number = this.serial_number.trim().split(/\s+/);
 			console.log(serial_number)
+			if (serial_number == "") {
+				alert('Cерийные номера: некорректный ввод');
+				return
+			}
 			const requestOptions = {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					serial_number: serial_number,
 					note: this.note,
-					//type: "http://127.0.0.1:8000/api/equipment-type/" + this.selected_type.toString() + "/"
 					type: this.selected_type
 				})
 			};
-			console.log(requestOptions)
-			fetch("http://127.0.0.1:8000/api/equipment/", requestOptions)
-			.then(response => {
-				console.log(response)
-				if(response.ok){
-					return response.json()    
-				} else {
-					response.json()
-					.then(result => {
-						console.log(result)
-						function get_details(result) {
-							var text = "";
-							for (let key in result) text = text + key + " : " + result[key] + "\n";
-							return text
-						}
-						alert(
-							"Server returned " + response.status + " : " + response.statusText + "\n" +
-							get_details(result)
-						);
-					})
-				}
-			})
+			callAPI(
+				requestOptions,
+				apiHost + 'api/equipment/',
+				function(response) {alert('Equipment successfully added')}
+			)
 		}
 	}
-})
-fetch("http://127.0.0.1:8000/api/equipment-type/", {
-	"method": "GET"
-})
-.then(response => {
-	console.log(response)
-	if(response.ok){
-		return response.json()    
-	} else{
-		response.json()
-		.then(result => {
-			alert(
-				"Server returned " + response.status + " : " + response.statusText + "\n" +
-				result.detail
-			);
-		})
-	}                
-})
-.then(response => {
-	console.log(response)
-	app.options = response
-	app2.options = app.options
-	//for (const idx in response) {
-	//	app.options.push(response[idx].name)
-	//}
 })
 
 Vue.component('equipment-item', {
@@ -132,8 +102,8 @@ Vue.component('equipment-item', {
 					<button class="uk-button uk-button-default" v-on:click="$emit(\'remove\')">Удалить</button>\
 				</template>\
 				<template v-if="mode == 1">\
-					<button class="uk-button uk-button-default" v-on:click="mode = 0; save()">Сохранить</button>\
-					<button class="uk-button uk-button-default" v-on:click="mode = 0; reload()">Отмена</button>\
+					<button class="uk-button uk-button-default" v-on:click="save()">Сохранить</button>\
+					<button class="uk-button uk-button-default" v-on:click="reload()">Отмена</button>\
 				</template>\
 			</td>\
 		</tr>\
@@ -145,8 +115,14 @@ Vue.component('equipment-item', {
 			this.type = this.equipment.type;
 			this.serial_number = this.equipment.serial_number;
 			this.note = this.equipment.note;
+			this.mode = 0;
 		},
 		save : function () {
+			var serial_number = this.serial_number.trim();
+			if (serial_number == "") {
+				alert('Cерийный номер: некорректный ввод');
+				return
+			}
 			this.$emit('modify', {
 				type: this.type,
 				serial_number: this.serial_number,
@@ -209,7 +185,7 @@ app2 = new Vue({
 				}
 			)
 		},
-		remData: function (id) {
+		remData: function (id, index) {
 			console.log('Remove', id)
 			const requestOptions = {
 				method: "DELETE",
@@ -217,10 +193,10 @@ app2 = new Vue({
 			callAPI(
 				requestOptions,
 				apiHost + 'api/equipment/' + id.toString() + '/',
-				function(response) {app2.getData()}
+				function(response) {app2.equipments.splice(index, 1)}
 			)
 		},
-		modData: function (id, data) {
+		modData: function (id, index, data) {
 			console.log('Modify', id, data)
 			const requestOptions = {
 				method: "PUT",
@@ -230,7 +206,7 @@ app2 = new Vue({
 			callAPI(
 				requestOptions,
 				apiHost + 'api/equipment/' + id.toString() + '/',
-				function(response) {app2.getData()}
+				function(response) {app2.$refs.row[index].mode = 0}
 			)
 		}
 	}
