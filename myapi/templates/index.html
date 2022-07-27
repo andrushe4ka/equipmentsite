@@ -58,6 +58,7 @@
 				v-on:modify="modData(equipment.id, $event)"
 			></tr>
 		</table>
+		<p><button v-on:click="addData" v-if="show_load_more">Загрузить еще</button></p>
 	</div>
 
 	<script src="{% static 'js/vueApp.js' %}"></script>

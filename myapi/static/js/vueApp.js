@@ -3,8 +3,11 @@ function get_details(result) {
 	for (let key in result) text = text + key + " : " + result[key] + "\n";
 	return text
 }
-function callAPI(requestOptions, relURL, action) {
-	fetch("http://127.0.0.1:8000/api/" + relURL, requestOptions)
+
+const apiHost = document.location.origin + '/'
+
+function callAPI(requestOptions, URL, action) {
+	fetch(URL, requestOptions)
 	.then(response => {
 		console.log(response)
 		if (response.ok){
@@ -159,6 +162,8 @@ app2 = new Vue({
 		searchText: '',
 		equipments: [],
 		options: [],
+		show_load_more: false,
+		next_page_url: '',
 	},
 	methods: {
 		getData: function () {
@@ -171,10 +176,36 @@ app2 = new Vue({
 			};
 			callAPI(
 				requestOptions,
-				'equipment/?search=' + this.searchText,
+				apiHost + 'api/equipment/?search=' + this.searchText,
 				function(response) {
-					app2.equipments = response;
-					if (response.length == 0) alert('Nothing found')
+					app2.equipments = response.results;
+					if (response.results.length == 0) alert('Nothing found');
+					if (response.next) {
+						app2.show_load_more = true;
+						app2.next_page_url = response.next;
+					} else {
+						app2.show_load_more = false;
+						app2.next_page_url = '';
+					}
+				}
+			)
+		},
+		addData: function () {
+			const requestOptions = {
+				method: "GET",
+			};
+			callAPI(
+				requestOptions,
+				this.next_page_url,
+				function(response) {
+					app2.equipments = app2.equipments.concat(response.results);
+					if (response.next) {
+						app2.show_load_more = true;
+						app2.next_page_url = response.next;
+					} else {
+						app2.show_load_more = false;
+						app2.next_page_url = '';
+					}
 				}
 			)
 		},
@@ -185,7 +216,7 @@ app2 = new Vue({
 			};
 			callAPI(
 				requestOptions,
-				'equipment/' + id.toString() + '/',
+				apiHost + 'api/equipment/' + id.toString() + '/',
 				function(response) {app2.getData()}
 			)
 		},
@@ -198,7 +229,7 @@ app2 = new Vue({
 			};
 			callAPI(
 				requestOptions,
-				'equipment/' + id.toString() + '/',
+				apiHost + 'api/equipment/' + id.toString() + '/',
 				function(response) {app2.getData()}
 			)
 		}

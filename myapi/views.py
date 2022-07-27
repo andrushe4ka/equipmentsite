@@ -9,6 +9,12 @@ from .models import EquipmentType, Equipment
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from rest_framework.pagination import PageNumberPagination
+class EquipmentListPagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'page_size'
+    max_page_size = 10000
+
 class EquipmentTypeView(generics.ListAPIView):
     queryset = EquipmentType.objects.all()
     serializer_class = serializers.EquipmentTypeSerializer
@@ -28,6 +34,7 @@ class EquipmentCreateView(generics.ListCreateAPIView):
     serializer_class = serializers.EquipmentSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['serial_number', 'note']
+    pagination_class = EquipmentListPagination
     authentication_classes = [BasicAuthentication]
     permission_classes = (AllowAny, )
     def post(self, request):
