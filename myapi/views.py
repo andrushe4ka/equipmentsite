@@ -29,6 +29,9 @@ class EquipmentViewSet(viewsets.ModelViewSet):
 
 from rest_framework.response import Response
 from rest_framework import filters
+from rest_framework.exceptions import ValidationError
+from rest_framework import status
+
 class EquipmentCreateView(generics.ListCreateAPIView):
     queryset = Equipment.objects.all()
     serializer_class = serializers.EquipmentSerializer
@@ -37,15 +40,29 @@ class EquipmentCreateView(generics.ListCreateAPIView):
     pagination_class = EquipmentListPagination
     authentication_classes = [BasicAuthentication]
     permission_classes = (AllowAny, )
+
     def post(self, request):
-        serializer = serializers.EquipmentCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        post_new = [Equipment.objects.create(
-            type=EquipmentType.objects.get(id=request.data['type']),
-            note=request.data['note'],
-            serial_number=serial_number
+
+        serializer_set = [serializers.EquipmentSerializer(
+            data = {
+                'type': request.data['type'],
+                'serial_number' : serial_number,
+                'note' : request.data['note'],
+            }
         ) for serial_number in request.data['serial_number']]
-        return Response([serializers.EquipmentSerializer(post).data for post in post_new], status=201)
+
+        errors = {}
+        for serializer in serializer_set:
+            if not serializer.is_valid():
+                errors.update(serializer.errors)
+
+        if errors:
+            raise ValidationError(errors)
+
+        for serializer in serializer_set:
+            serializer.save()
+
+        return Response([serializer.data for serializer in serializer_set], status=status.HTTP_201_CREATED)
 
 class EquipmentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Equipment.objects.all()
