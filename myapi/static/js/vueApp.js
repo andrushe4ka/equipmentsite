@@ -1,5 +1,9 @@
 function get_details(result) {
 	var text = "";
+	if (Array.isArray(result)) {
+		result.forEach(function(item) {text = text + get_details(item)});
+		return text
+	}
 	for (let key in result) text = text + key + " : " + result[key] + "\n";
 	return text
 }

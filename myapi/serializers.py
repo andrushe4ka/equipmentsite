@@ -42,5 +42,5 @@ class EquipmentSerializer(serializers.ModelSerializer):
 
         serial_number = data['serial_number']
         if not validate_serial_number(serial_number, serial_number_mask):
-            raise serializers.ValidationError({'serial_number':'not matching the mask "' + serial_number_mask + '"\n' + serial_number})
+            raise serializers.ValidationError({'serial_number':'not matching the mask "' + serial_number_mask + '": ' + serial_number})
         return data

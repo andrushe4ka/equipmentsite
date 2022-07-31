@@ -51,11 +51,7 @@ class EquipmentCreateView(generics.ListCreateAPIView):
             }
         ) for serial_number in request.data['serial_number']]
 
-        errors = {}
-        for serializer in serializer_set:
-            if not serializer.is_valid():
-                errors.update(serializer.errors)
-
+        errors = [serializer.errors for serializer in serializer_set if not serializer.is_valid()]
         if errors:
             raise ValidationError(errors)
 
